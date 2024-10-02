@@ -16,22 +16,19 @@ type CreateUserRequest struct {
 	Password string `json:"password" validate:"required,min=6"`
 }
 
-func CreateUser(c *fiber.Ctx, validate *validator.Validate) error {
-	// Bind request body to struct
-	req := new(CreateUserRequest)
-	if err := c.BodyParser(req); err != nil {
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "Invalid Request"})
-	}
-
-	// Validate request
-	if err := validate.Struct(req); err != nil {
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "Validation failed", "error": err.Error()})
-	}
-
-	// Get db instance from Fiber context
+func CreateUser(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
+	validate := c.Locals("validator").(*validator.Validate)
 
-	// Check if user already exists
+	var req CreateUserRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "Failed to parse request body"})
+	}
+
+	if err := validate.Struct(req); err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "Validation failed", "errors": err.Error()})
+	}
+
 	var existingUser models.User
 	if err := db.Where("email = ?", req.Email).First(&existingUser).Error; err == nil {
 		return c.Status(http.StatusConflict).JSON(fiber.Map{"message": "User already exists"})

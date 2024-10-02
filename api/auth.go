@@ -3,14 +3,15 @@ package api
 import (
 	"starter-go-gorm-postgresql-fiber/internal/auth"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
 
-func AuthController(app *fiber.App, validate *validator.Validate) {
+func AuthController(app *fiber.App) {
 	authGroup := app.Group("/users")
 
-	authGroup.Post("/", func(c *fiber.Ctx) error {
-		return auth.CreateUser(c, validate)
-	})
+	authGroup.Post("", auth.CreateUser)
+	authGroup.Get("/:id", auth.GetUser)
+	authGroup.Get("", auth.GetUsers)
+	authGroup.Patch("/:id", auth.UpdateUser)
+	authGroup.Delete("/:id", auth.DeleteUser)
 }

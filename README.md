@@ -45,3 +45,32 @@ curl -X POST http://localhost:3000/users \
   "password": "password123"
 }'
 ```
+
+### Get all users
+
+```bash
+curl http://localhost:3000/users
+```
+
+### Get a user by ID
+
+```bash
+curl http://localhost:3000/users/1
+```
+
+### Update a user
+
+```bash
+curl -X PATCH http://localhost:3000/users/1 \
+-H "Content-Type: application/json" \
+-d '{
+  "username": "robertdoe",
+  "email": "robertdoe@example.com"
+}'
+```
+
+### Delete a user
+
+```bash
+curl -X DELETE http://localhost:3000/users/1
+```
